@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['carton', 'plastico', 'vidrio']
+
+roboflow:
+  workspace: herock
+  project: detector_object_yolo11-72fme
+  version: 1
+  license: Private
+  url: https://app.roboflow.com/herock/detector_object_yolo11-72fme/1

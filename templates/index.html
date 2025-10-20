@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoDetector - Clasificación de Materiales Reciclables</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-recycle"></i>
+            <h1>EcoDetector</h1>
+        </div>
+        <nav class="nav">
+            <a href="#" class="active">Inicio</a>
+            <a href="#">Guía de Reciclaje</a>
+            <a href="#">Estadísticas</a>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <div class="detection-section">
+            <div class="video-container">
+                <img id="videoFeed" src="/video_feed" alt="Video en tiempo real">
+                <div class="detection-overlay" id="detectionInfo"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="captureBtn" class="btn">
+                    <i class="fas fa-camera"></i> Capturar
+                </button>
+                <button id="toggleDetectionBtn" class="btn btn-primary">
+                    <i class="fas fa-play"></i> Iniciar Detección
+                </button>
+                <button id="helpBtn" class="btn">
+                    <i class="fas fa-question-circle"></i> Ayuda
+                </button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="material-card">
+                <h3>Material Detectado</h3>
+                <div class="material-info" id="materialInfo">
+                    <div class="placeholder">
+                        <i class="fas fa-box-open"></i>
+                        <p>Coloca un objeto frente a la cámara</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recycling-tips">
+                <h3>¿Cómo reciclar?</h3>
+                <div class="tips-content" id="recyclingTips">
+                    <p>Selecciona un material para ver instrucciones de reciclaje</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2023 EcoDetector - Sistema de clasificación de materiales reciclables</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+path: ./dataset-resized
+train: images/train
+val: images/val
+
+names:
+  0: plastico
+  1: vidrio
+  2: metal
+  3: papel

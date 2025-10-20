@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Máquina Expendedora Inversa - EcoRecicla</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .machine-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .machine-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .detection-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .material-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .material-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .material-btn.plastic {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .material-btn.glass {
+            background: #2196F3;
+            color: white;
+        }
+
+        .material-btn.cardboard {
+            background: #FF9800;
+            color: white;
+        }
+
+        .material-btn i {
+            font-size: 1.5rem;
+        }
+
+        .info-display {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .balance {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2a5298;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .rates {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .rate-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-section {
+            text-align: center;
+        }
+
+        #qrcode {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            display: inline-block;
+            min-height: 256px;
+            min-width: 256px;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .action-btn:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+        }
+
+        .action-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .paypal-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .status-message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-processing {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+
+        .transaction-history {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .material-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>♻️ Máquina Expendedora Inversa</h1>
+            <p>Recicla plástico, vidrio y cartón a cambio de recompensas</p>
+        </div>
+
+        <div class="machine-container">
+            <!-- Panel izquierdo: Detección y información -->
+            <div class="panel">
+                <h2>Detección de Materiales</h2>
+                <div class="detection-area">
+                    <button class="material-btn plastic" onclick="detectMaterial('plástico')">
+                        <span class="material-icon">🥤</span> Insertar Plástico
+                    </button>
+                    <button class="material-btn glass" onclick="detectMaterial('vidrio')">
+                        <span class="material-icon">🍶</span> Insertar Vidrio
+                    </button>
+                    <button class="material-btn cardboard" onclick="detectMaterial('cartón')">
+                        <span class="material-icon">📦</span> Insertar Cartón
+                    </button>
+                </div>
+
+                <div class="info-display">
+                    <h3>Balance Actual</h3>
+                    <div class="balance" id="balance">$0.00</div>
+                    
+                    <h3>Tasas de Recompensa</h3>
+                    <div class="rates">
+                        <div class="rate-item">
+                            <div>🥤 Plástico</div>
+                            <div><strong>$0.05</strong></div>
+                        </div>
+                        <div class="rate-item">
+                            <div>🍶 Vidrio</div>
+                            <div><strong>$0.03</strong></div>
+                        </div>
+                        <div class="rate-item">
+                            <div>📦 Cartón</div>
+                            <div><strong>$0.02</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="plastic-count">0</div>
+                        <div class="stat-label">Plásticos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="glass-count">0</div>
+                        <div class="stat-label">Vidrios</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cardboard-count">0</div>
+                        <div class="stat-label">Cartones</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel derecho: QR y PayPal -->
+            <div class="panel">
+                <h2>Generar Código QR</h2>
+                <div class="qr-section">
+                    <button class="action-btn" id="generate-qr-btn" onclick="generateQRCode()" disabled>
+                        Generar Código QR
+                    </button>
+                    <div id="qrcode">
+                        <p>El código QR aparecerá aquí cuando generes uno</p>
+                    </div>
+                </div>
+
+                <div class="paypal-section">
+                    <h2>Conversión a PayPal</h2>
+                    <button class="action-btn" id="convert-paypal-btn" onclick="convertToPayPal()" disabled>
+                        Convertir a PayPal
+                    </button>
+                    <div id="status-message" class="status-message"></div>
+                </div>
+
+                <div class="transaction-history">
+                    <h3>Historial de Transacciones</h3>
+                    <div id="transaction-list">
+                        <p>No hay transacciones aún</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>EcoRecicla - Contribuyendo a un planeta más limpio 🌍</p>
+            <p>Esta es una simulación. Los fondos no son reales.</p>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la máquina
+        const machineState = {
+            balance: 0.0,
+            rewardRates: {
+                'plástico': 0.05,
+                'vidrio': 0.03,
+                'cartón': 0.02
+            },
+            materialCounts: {
+                'plástico': 0,
+                'vidrio': 0,
+                'cartón': 0
+            },
+            transactions: [],
+            currentQR: null
+        };
+
+        // Elementos del DOM
+        const balanceElement = document.getElementById('balance');
+        const generateQRBtn = document.getElementById('generate-qr-btn');
+        const convertPayPalBtn = document.getElementById('convert-paypal-btn');
+        const statusMessage = document.getElementById('status-message');
+        const transactionList = document.getElementById('transaction-list');
+        const plasticCountElement = document.getElementById('plastic-count');
+        const glassCountElement = document.getElementById('glass-count');
+        const cardboardCountElement = document.getElementById('cardboard-count');
+
+        // Función para detectar material
+        function detectMaterial(material) {
+            const reward = machineState.rewardRates[material];
+            machineState.balance += reward;
+            machineState.materialCounts[material]++;
+            
+            // Agregar transacción al historial
+            const transaction = {
+                id: Date.now(),
+                material: material,
+                reward: reward,
+                timestamp: new Date().toLocaleTimeString(),
+                balance: machineState.balance
+            };
+            machineState.transactions.unshift(transaction);
+            
+            updateUI();
+            showNotification(`✅ ${material.charAt(0).toUpperCase() + material.slice(1)} detectado! +$${reward.toFixed(2)}`);
+        }
+
+        // Función para generar código QR
+        function generateQRCode() {
+            if (machineState.balance <= 0) {
+                showStatusMessage('No hay fondos para generar código QR', 'error');
+                return;
+            }
+
+            const qrData = {
+                machineId: 'RVM001',
+                balance: machineState.balance,
+                timestamp: new Date().toISOString(),
+                transactionId: 'TXN' + Math.floor(10000 + Math.random() * 90000)
+            };
+
+            const qrJson = JSON.stringify(qrData);
+            
+            // Limpiar QR anterior
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Generar nuevo QR
+            QRCode.toCanvas(document.getElementById('qrcode'), qrJson, {
+                width: 256,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function(error) {
+                if (error) {
+                    console.error(error);
+                    showStatusMessage('Error generando QR', 'error');
+                } else {
+                    machineState.currentQR = qrJson;
+                    showStatusMessage(`✅ QR generado con $${machineState.balance.toFixed(2)}`, 'success');
+                }
+            });
+        }
+
+        // Función para convertir a PayPal
+        function convertToPayPal() {
+            if (machineState.balance <= 0) {
+                showStatusMessage('No hay fondos para convertir', 'error');
+                return;
+            }
+
+            showStatusMessage('🔄 Procesando transacción con PayPal...', 'processing');
+            
+            // Simular procesamiento con PayPal
+            setTimeout(() => {
+                const success = Math.random() > 0.05; // 95% de éxito
+                
+                if (success) {
+                    const convertedAmount = machineState.balance;
+                    machineState.balance = 0;
+                    
+                    // Agregar transacción de conversión
+                    const conversionTransaction = {
+                        id: Date.now(),
+                        type: 'paypal_conversion',
+                        amount: convertedAmount,
+                        timestamp: new Date().toLocaleTimeString(),
+                        status: 'completed'
+                    };
+                    machineState.transactions.unshift(conversionTransaction);
+                    
+                    showStatusMessage(`✅ ¡Éxito! $${convertedAmount.toFixed(2)} transferidos a PayPal`, 'success');
+                    updateUI();
+                } else {
+                    showStatusMessage('❌ Error en la transacción. Intenta nuevamente.', 'error');
+                }
+            }, 2000);
+        }
+
+        // Función para actualizar la UI
+        function updateUI() {
+            // Actualizar balance
+            balanceElement.textContent = `$${machineState.balance.toFixed(2)}`;
+            
+            // Actualizar contadores de materiales
+            plasticCountElement.textContent = machineState.materialCounts['plástico'];
+            glassCountElement.textContent = machineState.materialCounts['vidrio'];
+            cardboardCountElement.textContent = machineState.materialCounts['cartón'];
+            
+            // Habilitar/deshabilitar botones
+            generateQRBtn.disabled = machineState.balance <= 0;
+            convertPayPalBtn.disabled = machineState.balance <= 0;
+            
+            // Actualizar historial de transacciones
+            updateTransactionHistory();
+        }
+
+        // Función para actualizar el historial de transacciones
+        function updateTransactionHistory() {
+            if (machineState.transactions.length === 0) {
+                transactionList.innerHTML = '<p>No hay transacciones aún</p>';
+                return;
+            }
+            
+            let html = '';
+            machineState.transactions.slice(0, 5).forEach(transaction => {
+                if (transaction.type === 'paypal_conversion') {
+                    html += `
+                        <div class="history-item">
+                            <div>💰 Conversión a PayPal</div>
+                            <div>+$${transaction.amount.toFixed(2)}</div>
+                            <div>${transaction.timestamp}</div>
+                        </div>
+                    `;
+                } else {
+                    const materialIcons = {
+                        'plástico': '🥤',
+                        'vidrio': '🍶',
+                        'cartón': '📦'
+                    };
+                    
+                    html += `
+                        <div class="history-item">
+                            <div>${materialIcons[transaction.material]} ${transaction.material.charAt(0).toUpperCase() + transaction.material.slice(1)}</div>
+                            <div>+$${transaction.reward.toFixed(2)}</div>
+                            <div>${transaction.timestamp}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            transactionList.innerHTML = html;
+        }
+
+        // Función para mostrar mensajes de estado
+        function showStatusMessage(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message';
+            
+            switch(type) {
+                case 'success':
+                    statusMessage.classList.add('status-success');
+                    break;
+                case 'error':
+                    statusMessage.classList.add('status-error');
+                    break;
+                case 'processing':
+                    statusMessage.classList.add('status-processing');
+                    break;
+            }
+            
+            // Limpiar mensaje después de 5 segundos
+            if (type !== 'processing') {
+                setTimeout(() => {
+                    statusMessage.textContent = '';
+                    statusMessage.className = 'status-message';
+                }, 5000);
+            }
+        }
+
+        // Función para mostrar notificaciones temporales
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #4CAF50;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: bold;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        // Inicializar la UI
+        updateUI();
+
+        // Simular detección automática ocasional (para demo)
+        setInterval(() => {
+            if (Math.random() > 0.7 && machineState.balance < 2.00) {
+                const materials = ['plástico', 'vidrio', 'cartón'];
+                const randomMaterial = materials[Math.floor(Math.random() * materials.length)];
+                detectMaterial(randomMaterial);
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

@@ -90,6 +90,10 @@ mediapipe==0.10.14
 
 pip install -r requirements.txt
 
+## 🔧 Solución Rápida
+Actualiza Ultralytics a la versión más reciente:
+pip install ultralytics --upgrade
+
 ## 🌐 Aplicación Web Principal
 python app.py
 

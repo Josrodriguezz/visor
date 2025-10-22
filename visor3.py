@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 
 # Cargamos el modelo YOLO
-model = YOLO('yolov8n.pt')  # Modelo YOLOv8 nano
+model = YOLO('runs/detect/train/weights/best.pt')
 
 # Cargamos el video de entrada
 #video_path = "./Inputs/people_walking.mp4"

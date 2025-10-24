@@ -7,3 +7,5 @@ torch>=2.1.0
 torchvision>=0.16.0
 Pillow>=10.0.0
 mediapipe==0.10.14
+qrcode[pil]==7.4.2
+Pillow==10.1.0
